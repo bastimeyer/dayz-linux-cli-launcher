@@ -26,7 +26,7 @@ Proton is currently unable to start the game's own regular launcher application 
 
 ## Important notes
 
-In order for the game to actually run on Linux via Proton, the [`vm.max_map_count`][vm.max_map_count] kernel parameter ([original definition][definition]) needs to be set, otherwise the game will freeze while loading or after playing for a couple of minutes:
+In order for the game to actually run on Linux via Proton, the [`vm.max_map_count`][vm.max_map_count] kernel parameter needs to be increased, because otherwise the game will freeze while loading the main menu or after playing for a couple of minutes. Some custom kernels like TK-Glitch for example already increase this value from its [default value of `64*1024-6`][vm.max_map_count-default] to `512*1024`, but even this won't work reliably. Increasing it to `1024*1024` seems to work.
 
 ```sh
 ​sudo sysctl -w vm.max_map_count=1048576
@@ -40,4 +40,4 @@ or applied permanently:
 
 
   [vm.max_map_count]: https://github.com/torvalds/linux/blob/v5.15/Documentation/admin-guide/sysctl/vm.rst#max_map_count
-  [definition]: https://github.com/torvalds/linux/blob/v5.15/include/linux/mm.h#L185-L202
+  [vm.max_map_count-default]: https://github.com/torvalds/linux/blob/v5.15/include/linux/mm.h#L185-L202
