@@ -86,8 +86,8 @@ check_dir "${DIR_DAYZ}"
 check_dir "${DIR_WORKSHOP}"
 
 if [[ -n "${SERVER}" ]]; then
-  msg "Querying API for server: ${SERVER}:${PORT}"
-  query="$(sed -e "s/@ADDRESS@/${SERVER}/" -e "s/@PORT@/${PORT}/" <<< "${API_URL}")"
+  msg "Querying API for server: ${SERVER%:*}:${PORT}"
+  query="$(sed -e "s/@ADDRESS@/${SERVER%:*}/" -e "s/@PORT@/${PORT}/" <<< "${API_URL}")"
   debug "Querying ${query}"
   response="$(curl "${API_PARAMS[@]}" "${query}")"
   INPUT+=( $(jq -r ".mods[] | select(.app_id == ${DAYZ_ID}) | .id" <<< "${response}") )
@@ -116,6 +116,9 @@ done
 cmdline=()
 if [[ "${#mods[@]}" -gt 0 ]]; then
   cmdline+=("\"-mod=$(IFS=";"; echo "${mods[*]}")\"")
+fi
+if [[ "${LAUNCH}" == 1 ]] && [[ -n "${SERVER}" ]]; then
+  cmdline+=("-connect=${SERVER}")
 fi
 
 if [[ "${LAUNCH}" == 1 ]]; then
