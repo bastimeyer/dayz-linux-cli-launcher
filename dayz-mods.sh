@@ -18,6 +18,8 @@ API_PARAMS=(
   -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
 )
 
+WORKSHOP_URL="https://steamcommunity.com/sharedfiles/filedetails/?id=@ID@"
+
 DEBUG=0
 LAUNCH=0
 SERVER=""
@@ -96,10 +98,16 @@ if [[ -n "${SERVER}" ]]; then
   INPUT+=( $(jq -r ".mods[] | select(.app_id == ${DAYZ_ID}) | .id" <<< "${response}") )
 fi
 
+missing=0
 mods=()
 for modid in "${INPUT[@]}"; do
   modpath="${DIR_WORKSHOP}/${modid}"
-  [[ -d "${modpath}" ]] || err "Missing mod directory for: ${modid}"
+  if ! [[ -d "${modpath}" ]]; then
+    missing=1
+    msg "Missing mod directory for: ${modid}"
+    msg "Subscribe the mod here: $(sed -e "s/@ID@/${modid}/" <<< "${WORKSHOP_URL}")"
+    continue
+  fi
 
   modmeta="${modpath}/meta.cpp"
   [[ -f "${modmeta}" ]] || err "Missing mod metadata for: ${modid}"
@@ -115,6 +123,7 @@ for modid in "${INPUT[@]}"; do
 
   mods+=("@${modname}")
 done
+[[ "${missing}" == 1 ]] && exit 1
 
 cmdline=()
 if [[ "${#mods[@]}" -gt 0 ]]; then
