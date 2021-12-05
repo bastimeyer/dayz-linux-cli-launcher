@@ -13,6 +13,7 @@ DIR_DAYZ="${STEAM_ROOT}/common/DayZ"
 API_URL="https://api.daemonforge.dev/server/@ADDRESS@/@PORT@/full"
 API_PARAMS=(
   -sSL
+  -m 10
   -H "Referer: https://daemonforge.dev/"
   -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
 )
@@ -89,7 +90,9 @@ if [[ -n "${SERVER}" ]]; then
   msg "Querying API for server: ${SERVER%:*}:${PORT}"
   query="$(sed -e "s/@ADDRESS@/${SERVER%:*}/" -e "s/@PORT@/${PORT}/" <<< "${API_URL}")"
   debug "Querying ${query}"
-  response="$(curl "${API_PARAMS[@]}" "${query}")"
+  response="$(curl "${API_PARAMS[@]}" "${query}" || err "Error while querying API")"
+  debug "Parsing API response"
+  jq -e ".mods[]" 2>&1 >/dev/null <<< "${response}" || err "Missing mods data from API response"
   INPUT+=( $(jq -r ".mods[] | select(.app_id == ${DAYZ_ID}) | .id" <<< "${response}") )
 fi
 
