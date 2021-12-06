@@ -28,6 +28,11 @@ Command line options:
     Launch DayZ after resolving and setting up mods
     instead of printing the game's -mod command line argument.
 
+  -n <name>
+  --name <name>
+    Set the profile name when launching the game via --launch.
+    Some community servers require a profile name when trying to connect.
+
   -s <address[:port]>
   --server <address[:port]>
     Retrieve a server's mod list and add it to the remaining input.

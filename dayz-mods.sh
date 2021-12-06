@@ -24,6 +24,7 @@ DEBUG=0
 LAUNCH=0
 SERVER=""
 PORT="27016"
+NAME=""
 INPUT=()
 MODS=()
 
@@ -56,6 +57,11 @@ Command line options:
   --launch
     Launch DayZ after resolving and setting up mods
     instead of printing the game's -mod command line argument.
+
+  -n <name>
+  --name <name>
+    Set the profile name when launching the game via --launch.
+    Some community servers require a profile name when trying to connect.
 
   -s <address[:port]>
   --server <address[:port]>
@@ -99,6 +105,10 @@ while (( "$#" )); do
       ;;
     -p|--port)
       PORT="${2}"
+      shift
+      ;;
+    -n|--name)
+      NAME="${2}"
       shift
       ;;
     *)
@@ -199,6 +209,7 @@ main() {
     local cmdline=()
     [[ -n "${mods}" ]] && cmdline+=("-mod=${mods}")
     [[ -n "${SERVER}" ]] && cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
+    [[ -n "${NAME}" ]] && cmdline+=("-name=${NAME}")
     ( set -x; steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"; )
   elif [[ -n "${mods}" ]]; then
     msg "Add this to your game's launch options, including the quotes:"
