@@ -25,6 +25,7 @@ LAUNCH=0
 SERVER=""
 PORT="27016"
 INPUT=()
+MODS=()
 
 declare -A DEPS=(
   [gawk]=gawk
@@ -132,63 +133,77 @@ check_dir() {
 # ----
 
 
-for dep in "${!DEPS[@]}"; do
-  command -v "${dep}" 2>&1 >/dev/null || err "${DEPS["${dep}"]} is missing. Aborting."
-done
+check_deps() {
+  for dep in "${!DEPS[@]}"; do
+    command -v "${dep}" 2>&1 >/dev/null || err "${DEPS["${dep}"]} is missing. Aborting."
+  done
+}
 
-check_dir "${DIR_DAYZ}"
-check_dir "${DIR_WORKSHOP}"
+query_server_api() {
+  [[ -z "${SERVER}" ]] && return
 
-if [[ -n "${SERVER}" ]]; then
+  local query
+  local response
   msg "Querying API for server: ${SERVER%:*}:${PORT}"
   query="$(sed -e "s/@ADDRESS@/${SERVER%:*}/" -e "s/@PORT@/${PORT}/" <<< "${API_URL}")"
   debug "Querying ${query}"
   response="$(curl "${API_PARAMS[@]}" "${query}")"
-  [[ $? > 0 ]] && err "Error while querying API"
   debug "Parsing API response"
   jq -e ".mods[]" 2>&1 >/dev/null <<< "${response}" || err "Missing mods data from API response"
+
   INPUT+=( $(jq -r ".mods[] | select(.app_id == ${DAYZ_ID}) | .id" <<< "${response}") )
-fi
+}
 
-missing=0
-mods=()
-for modid in "${INPUT[@]}"; do
-  modpath="${DIR_WORKSHOP}/${modid}"
-  if ! [[ -d "${modpath}" ]]; then
-    missing=1
-    msg "Missing mod directory for: ${modid}"
-    msg "Subscribe the mod here: $(sed -e "s/@ID@/${modid}/" <<< "${WORKSHOP_URL}")"
-    continue
+setup_mods() {
+  local missing=0
+  for modid in "${INPUT[@]}"; do
+    local modpath="${DIR_WORKSHOP}/${modid}"
+    if ! [[ -d "${modpath}" ]]; then
+      missing=1
+      msg "Missing mod directory for: ${modid}"
+      msg "Subscribe the mod here: $(sed -e "s/@ID@/${modid}/" <<< "${WORKSHOP_URL}")"
+      continue
+    fi
+
+    local modmeta="${modpath}/meta.cpp"
+    [[ -f "${modmeta}" ]] || err "Missing mod metadata for: ${modid}"
+
+    local modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
+    [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
+    debug "Mod ${modid} found: ${modname}"
+    modname="${modname//\'/}"
+
+    if ! [[ -L "${DIR_DAYZ}/@${modname}" ]]; then
+      msg "Creating mod symlink for: ${modname}"
+      ln -sr "${modpath}" "${DIR_DAYZ}/@${modname}"
+    fi
+
+    MODS+=("@${modname}")
+  done
+
+  return ${missing}
+}
+
+
+main() {
+  check_deps
+  check_dir "${DIR_DAYZ}"
+  check_dir "${DIR_WORKSHOP}"
+
+  query_server_api
+  setup_mods || exit 1
+
+  local mods="$(IFS=";"; echo "${MODS[*]}")"
+
+  if [[ "${LAUNCH}" == 1 ]]; then
+    local cmdline=()
+    [[ -n "${mods}" ]] && cmdline+=("-mod=${mods}")
+    [[ -n "${SERVER}" ]] && cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
+    ( set -x; steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"; )
+  elif [[ -n "${mods}" ]]; then
+    msg "Add this to your game's launch options, including the quotes:"
+    echo "\"-mod=${mods}\""
   fi
+}
 
-  modmeta="${modpath}/meta.cpp"
-  [[ -f "${modmeta}" ]] || err "Missing mod metadata for: ${modid}"
-
-  modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
-  [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
-  debug "Mod ${modid} found: ${modname}"
-  modname="${modname//\'/}"
-
-  if ! [[ -L "${DIR_DAYZ}/@${modname}" ]]; then
-    msg "Creating mod symlink for: ${modname}"
-    ln -sr "${modpath}" "${DIR_DAYZ}/@${modname}"
-  fi
-
-  mods+=("@${modname}")
-done
-[[ "${missing}" == 1 ]] && exit 1
-
-cmdline=()
-if [[ "${#mods[@]}" -gt 0 ]]; then
-  cmdline+=("-mod=$(IFS=";"; echo "${mods[*]}")")
-fi
-if [[ "${LAUNCH}" == 1 ]] && [[ -n "${SERVER}" ]]; then
-  cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
-fi
-
-if [[ "${LAUNCH}" == 1 ]]; then
-  set -x
-  steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"
-else
-  echo "${cmdline[@]}"
-fi
+main
