@@ -94,8 +94,6 @@ chmod +x dayz-launcher.sh
 ./dayz-launcher.sh ...
 ```
 
-This repository currently does not commit to any versioning scheme, so please be aware of any breaking changes that may be applied in the future.
-
 ## Install DayZ
 
 [Support for BattlEye anti-cheat for Proton on Linux has been officially announced by Valve on 2021-12-03.][battleye-announcement]
