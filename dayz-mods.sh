@@ -183,7 +183,7 @@ if [[ "${#mods[@]}" -gt 0 ]]; then
   cmdline+=("-mod=$(IFS=";"; echo "${mods[*]}")")
 fi
 if [[ "${LAUNCH}" == 1 ]] && [[ -n "${SERVER}" ]]; then
-  cmdline+=("-connect=${SERVER}")
+  cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
 fi
 
 if [[ "${LAUNCH}" == 1 ]]; then
