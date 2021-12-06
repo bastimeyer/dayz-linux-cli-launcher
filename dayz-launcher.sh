@@ -29,10 +29,10 @@ INPUT=()
 MODS=()
 
 declare -A DEPS=(
-  [gawk]=gawk
-  [curl]=curl
-  [jq]=jq
-  [steam]=steam
+  [gawk]="required for parsing the mod metadata"
+  [curl]="required for querying the server API"
+  [jq]="required for parsing the server API's JSON response"
+  [steam]="required for launching the game"
 )
 
 
@@ -145,7 +145,7 @@ check_dir() {
 
 check_deps() {
   for dep in "${!DEPS[@]}"; do
-    command -v "${dep}" 2>&1 >/dev/null || err "${DEPS["${dep}"]} is missing. Aborting."
+    command -v "${dep}" 2>&1 >/dev/null || err "'${dep}' is missing (${DEPS["${dep}"]}). Aborting."
   done
 }
 
