@@ -3,12 +3,14 @@ set -eo pipefail
 
 SELF=$(basename "$(readlink -f "${0}")")
 
-[[ -z "${STEAM_ROOT}" ]] && STEAM_ROOT="${XDG_DATA_HOME:-${HOME}/.local/share}/Steam"
-STEAM_ROOT="${STEAM_ROOT}/steamapps"
-
 DAYZ_ID=221100
-DIR_WORKSHOP="${STEAM_ROOT}/workshop/content/${DAYZ_ID}"
-DIR_DAYZ="${STEAM_ROOT}/common/DayZ"
+
+FLATPAK_STEAM="com.valvesoftware.Steam"
+FLATPAK_PARAMS=(
+  --branch=stable
+  --arch=x86_64
+  --command=/app/bin/steam-wrapper
+)
 
 API_URL="https://api.daemonforge.dev/server/@ADDRESS@/@PORT@/full"
 API_PARAMS=(
@@ -20,8 +22,10 @@ API_PARAMS=(
 
 WORKSHOP_URL="https://steamcommunity.com/sharedfiles/filedetails/?id=@ID@"
 
+
 DEBUG=0
 LAUNCH=0
+STEAM=""
 SERVER=""
 PORT="27016"
 NAME=""
@@ -32,7 +36,6 @@ declare -A DEPS=(
   [gawk]="required for parsing the mod metadata"
   [curl]="required for querying the server API"
   [jq]="required for parsing the server API's JSON response"
-  [steam]="required for launching the game"
 )
 
 
@@ -52,6 +55,11 @@ Command line options:
   -d
   --debug
     Print debug messages to output.
+
+  --steam <"" | flatpak | /path/to/steam/executable>
+    If set to flatpak, use the flatpak version of Steam (${FLATPAK_STEAM}).
+    Steam needs to already be running in the flatpak container.
+    Default is: "" (automatic detection - prefers flatpak if available)
 
   -l
   --launch
@@ -81,6 +89,9 @@ Environment variables:
     \${XDG_DATA_HOME:-\${HOME}/.local/share}/Steam
     which defaults to ~/.local/share/Steam
 
+    If the flatpak package is being used, then the default is:
+    ~/.var/app/${FLATPAK_STEAM}/data/Steam
+
     If the game is stored in a different Steam library directory, then this
     environment variable needs to be set/changed.
 EOF
@@ -95,6 +106,10 @@ while (( "$#" )); do
       ;;
     -d|--debug)
       DEBUG=1
+      ;;
+    --steam)
+      STEAM="${2}"
+      shift
       ;;
     -l|--launch)
       LAUNCH=1
@@ -136,17 +151,45 @@ debug() {
 }
 
 check_dir() {
+  debug "Checking directory: ${1}"
   [[ -d "${1}" ]] || err "Invalid/missing directory: ${1}"
+}
+
+check_dep() {
+  command -v "${1}" 2>&1 >/dev/null
+}
+
+check_deps() {
+  for dep in "${!DEPS[@]}"; do
+    check_dep "${dep}" || err "'${dep}' is missing (${DEPS["${dep}"]}). Aborting."
+  done
+}
+
+check_flatpak() {
+  check_dep flatpak \
+    && flatpak info "${FLATPAK_STEAM}" 2>&1 >/dev/null \
+    && { flatpak ps | grep "${FLATPAK_STEAM}"; } 2>&1 >/dev/null
 }
 
 
 # ----
 
 
-check_deps() {
-  for dep in "${!DEPS[@]}"; do
-    command -v "${dep}" 2>&1 >/dev/null || err "'${dep}' is missing (${DEPS["${dep}"]}). Aborting."
-  done
+resolve_steam() {
+  if [[ "${STEAM}" == flatpak ]]; then
+    check_flatpak || err "Could not find a running instance of the '${FLATPAK_STEAM}' flatpak package"
+  elif [[ -n "${STEAM}" ]]; then
+    check_dep "${STEAM}" || err "Could not find the '${STEAM}' executable"
+  else
+    msg "Resolving steam"
+    if check_flatpak; then
+      STEAM=flatpak
+    elif check_dep steam; then
+      STEAM=steam
+    else
+      err "Could not find a running instance of the '${FLATPAK_STEAM}' flatpak package or the 'steam' executable"
+    fi
+  fi
 }
 
 query_server_api() {
@@ -165,9 +208,12 @@ query_server_api() {
 }
 
 setup_mods() {
+  local dir_dayz="${1}"
+  local dir_workshop="${2}"
   local missing=0
+
   for modid in "${INPUT[@]}"; do
-    local modpath="${DIR_WORKSHOP}/${modid}"
+    local modpath="${dir_workshop}/${modid}"
     if ! [[ -d "${modpath}" ]]; then
       missing=1
       msg "Missing mod directory for: ${modid}"
@@ -183,9 +229,9 @@ setup_mods() {
     debug "Mod ${modid} found: ${modname}"
     modname="${modname//\'/}"
 
-    if ! [[ -L "${DIR_DAYZ}/@${modname}" ]]; then
+    if ! [[ -L "${dir_dayz}/@${modname}" ]]; then
       msg "Creating mod symlink for: ${modname}"
-      ln -sr "${modpath}" "${DIR_DAYZ}/@${modname}"
+      ln -sr "${modpath}" "${dir_dayz}/@${modname}"
     fi
 
     MODS+=("@${modname}")
@@ -194,14 +240,41 @@ setup_mods() {
   return ${missing}
 }
 
+run_steam() {
+  if [[ "${STEAM}" == flatpak ]]; then
+    ( set -x; flatpak run "${FLATPAK_PARAMS[@]}" "${FLATPAK_STEAM}" "${@}"; )
+  else
+    ( set -x; steam "${@}"; )
+  fi
+}
+
 
 main() {
   check_deps
-  check_dir "${DIR_DAYZ}"
-  check_dir "${DIR_WORKSHOP}"
+  resolve_steam
+
+  if [[ "${STEAM}" == flatpak ]]; then
+    msg "Using flatpak mode"
+  else
+    msg "Using non-flatpak mode: ${STEAM}"
+  fi
+
+  if [[ -z "${STEAM_ROOT}" ]]; then
+    if [[ "${STEAM}" == flatpak ]]; then
+      STEAM_ROOT="${HOME}/.var/app/${FLATPAK_STEAM}/data/Steam"
+    else
+      STEAM_ROOT="${XDG_DATA_HOME:-${HOME}/.local/share}/Steam"
+    fi
+  fi
+  STEAM_ROOT="${STEAM_ROOT}/steamapps"
+
+  local dir_dayz="${STEAM_ROOT}/common/DayZ"
+  local dir_workshop="${STEAM_ROOT}/workshop/content/${DAYZ_ID}"
+  check_dir "${dir_dayz}"
+  check_dir "${dir_workshop}"
 
   query_server_api
-  setup_mods || exit 1
+  setup_mods "${dir_dayz}" "${dir_workshop}" || exit 1
 
   local mods="$(IFS=";"; echo "${MODS[*]}")"
 
@@ -211,7 +284,7 @@ main() {
     [[ -n "${SERVER}" ]] && cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
     [[ -n "${NAME}" ]] && cmdline+=("-name=${NAME}")
     msg "Launching DayZ"
-    ( set -x; steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"; )
+    run_steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"
   elif [[ -n "${mods}" ]]; then
     msg "Add this to your game's launch options, including the quotes:"
     echo "\"-mod=${mods}\""

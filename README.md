@@ -29,6 +29,11 @@ Command line options:
   --debug
     Print debug messages to output.
 
+  --steam <"" | flatpak | /path/to/steam/executable>
+    If set to flatpak, use the flatpak version of Steam (com.valvesoftware.Steam).
+    Steam needs to already be running in the flatpak container.
+    Default is: "" (automatic detection - prefers flatpak if available)
+
   -l
   --launch
     Launch DayZ after resolving and setting up mods instead of
@@ -56,6 +61,9 @@ Environment variables:
     Set a custom path to Steam's root directory. Default is:
     ${XDG_DATA_HOME:-${HOME}/.local/share}/Steam
     which defaults to ~/.local/share/Steam
+
+    If the flatpak package is being used, then the default is:
+    ~/.var/app/com.valvesoftware.Steam/data/Steam
 
     If the game is stored in a different Steam library directory, then this
     environment variable needs to be set/changed.
@@ -86,7 +94,7 @@ chmod +x dayz-launcher.sh
 ./dayz-launcher.sh ...
 ```
 
-This repository currently does not submit to any versioning scheme, so please be aware of any breaking changes that may be applied in the future.
+This repository currently does not commit to any versioning scheme, so please be aware of any breaking changes that may be applied in the future.
 
 ## Install DayZ
 
