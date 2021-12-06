@@ -210,6 +210,7 @@ main() {
     [[ -n "${mods}" ]] && cmdline+=("-mod=${mods}")
     [[ -n "${SERVER}" ]] && cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
     [[ -n "${NAME}" ]] && cmdline+=("-name=${NAME}")
+    msg "Launching DayZ"
     ( set -x; steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"; )
   elif [[ -n "${mods}" ]]; then
     msg "Add this to your game's launch options, including the quotes:"
