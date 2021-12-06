@@ -167,6 +167,7 @@ for modid in "${INPUT[@]}"; do
   modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
   [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
   debug "Mod ${modid} found: ${modname}"
+  modname="${modname//\'/}"
 
   if ! [[ -L "${DIR_DAYZ}/@${modname}" ]]; then
     msg "Creating mod symlink for: ${modname}"
