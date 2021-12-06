@@ -33,8 +33,59 @@ declare -A DEPS=(
   [steam]=steam
 )
 
+
+print_help() {
+  cat <<EOF
+Usage: ${SELF} [OPTION]... [MODID]...
+
+Automatically set up mods for the DayZ client
+and print the game's -mod command line argument.
+
+Command line options:
+
+  -h
+  --help
+    Print this help text.
+
+  -d
+  --debug
+    Print debug messages to output.
+
+  -l
+  --launch
+    Launch DayZ after resolving and setting up mods
+    instead of printing the game's -mod command line argument.
+
+  -s <address[:port]>
+  --server <address[:port]>
+    Retrieve a server's mod list and add it to the remaining input.
+    Uses the daemonforge.dev DayZ server JSON API.
+    If --launch is set, it will automatically connect to the server.
+
+  -p <port>
+  --port <port>
+    The server's query port (not to be confused with the server's game port).
+    Default is: 27016
+
+Environment variables:
+
+  STEAM_ROOT
+    Set a custom path to Steam's root directory. Default is:
+    \${XDG_DATA_HOME:-\${HOME}/.local/share}/Steam
+    which defaults to ~/.local/share/Steam
+
+    If the game is stored in a different Steam library directory, then this
+    environment variable needs to be set/changed.
+EOF
+}
+
+
 while (( "$#" )); do
   case "${1}" in
+    -h|--help)
+      print_help
+      exit
+      ;;
     -d|--debug)
       DEBUG=1
       ;;

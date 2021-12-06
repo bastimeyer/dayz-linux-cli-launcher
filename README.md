@@ -15,7 +15,6 @@ Proton is currently unable to start the game's own regular launcher application 
 
 ## TODO
 
-- Add `--help` message
 - Don't use a custom server query API and query the server directly
 - Install mods automatically (only the `steamcmd` CLI utility seems to be able to do this from a command line shell context)
 - If possible, resolve mod dependencies
