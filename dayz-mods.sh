@@ -180,7 +180,7 @@ done
 
 cmdline=()
 if [[ "${#mods[@]}" -gt 0 ]]; then
-  cmdline+=("\"-mod=$(IFS=";"; echo "${mods[*]}")\"")
+  cmdline+=("-mod=$(IFS=";"; echo "${mods[*]}")")
 fi
 if [[ "${LAUNCH}" == 1 ]] && [[ -n "${SERVER}" ]]; then
   cmdline+=("-connect=${SERVER}")
