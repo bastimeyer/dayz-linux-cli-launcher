@@ -40,8 +40,8 @@ print_help() {
   cat <<EOF
 Usage: ${SELF} [OPTION]... [MODID]...
 
-Automatically set up mods for the DayZ client
-and print the game's -mod command line argument.
+Automatically set up mods for DayZ, launch the game and connect to a server,
+or print the game's -mod command line argument for custom configuration.
 
 Command line options:
 
@@ -55,8 +55,8 @@ Command line options:
 
   -l
   --launch
-    Launch DayZ after resolving and setting up mods
-    instead of printing the game's -mod command line argument.
+    Launch DayZ after resolving and setting up mods instead of
+    printing the game's -mod command line argument.
 
   -n <name>
   --name <name>
@@ -71,7 +71,7 @@ Command line options:
 
   -p <port>
   --port <port>
-    The server's query port (not to be confused with the server's game port).
+    The server's query port, not to be confused with the server's game port.
     Default is: 27016
 
 Environment variables:

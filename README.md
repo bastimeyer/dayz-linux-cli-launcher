@@ -1,17 +1,23 @@
-DayZ Linux workshop setup
+DayZ Linux CLI launcher
 ====
 
-This is an experimental and still work-in-progress setup+launcher script for workshop mods of DayZ standalone when running the game via Proton on Linux.
+## About
 
-Proton is currently unable to start the game's own regular launcher application which sets up mods and launch parameters for the game client. The game however does work fine when launching the client directly, so mods can be set up and configured manually, which is what this script tries to do, similar to what the launcher would do.
+This is an experimental launcher script for DayZ standalone on Linux when running the game via Proton.
+
+Proton is currently unable to start the game's own regular launcher application which sets up mods and launch parameters for the game client. The game however does work fine when launching the client directly, so mods can be set up and configured manually, which is what this script does, similar to what the launcher would do.
+
+Automatic Steam workshop mod downloads are currently unsupported due to a limitation of Steam's CLI. Workshop mods will therefore need to be subscribed manually via the web browser. A URL for each missing mod will be printed to the output.
+
+Please see the "Important notes" section down below to get the game running on Linux.
 
 ## Usage
 
 ```
-Usage: dayz-mods.sh [OPTION]... [MODID]...
+Usage: dayz-launcher.sh [OPTION]... [MODID]...
 
-Automatically set up mods for the DayZ client
-and print the game's -mod command line argument.
+Automatically set up mods for DayZ, launch the game and connect to a server,
+or print the game's -mod command line argument for custom configuration.
 
 Command line options:
 
@@ -25,8 +31,8 @@ Command line options:
 
   -l
   --launch
-    Launch DayZ after resolving and setting up mods
-    instead of printing the game's -mod command line argument.
+    Launch DayZ after resolving and setting up mods instead of
+    printing the game's -mod command line argument.
 
   -n <name>
   --name <name>
@@ -41,7 +47,7 @@ Command line options:
 
   -p <port>
   --port <port>
-    The server's query port (not to be confused with the server's game port).
+    The server's query port, not to be confused with the server's game port.
     Default is: 27016
 
 Environment variables:
@@ -55,23 +61,12 @@ Environment variables:
     environment variable needs to be set/changed.
 ```
 
-## Examples
-
-```sh
-./dayz-mods.sh MODID1 MODID2 MODID3...
-./dayz-mods.sh --server ADDRESS
-./dayz-mods.sh --launch --server ADDRESS
-```
-
 ## TODO
 
 - Don't use a custom server query API and query the server directly
-- Install mods automatically (only the `steamcmd` CLI utility seems to be able to do this from a command line shell context)
+- Install mods automatically
+  Unfortunately, Steam doesn't support downloading workshop mods via the CLI and only the `steamcmd` CLI utility seems to be able to do this from a command line shell context, but this requires a Steam login via CLI parameters, which is a bit unpractical.
 - If possible, resolve mod dependencies
-
-## Known Issues
-
-- Mod names which contain special characters like `'` for example don't get interpreted correctly by Steam as launch argument, meaning the `--launch` parameter won't work
 
 ## Important notes
 
