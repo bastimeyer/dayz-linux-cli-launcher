@@ -156,7 +156,7 @@ check_dir() {
 }
 
 check_dep() {
-  command -v "${1}" 2>&1 >/dev/null
+  command -v "${1}" >/dev/null 2>&1
 }
 
 check_deps() {
@@ -167,8 +167,8 @@ check_deps() {
 
 check_flatpak() {
   check_dep flatpak \
-    && flatpak info "${FLATPAK_STEAM}" 2>&1 >/dev/null \
-    && { flatpak ps | grep "${FLATPAK_STEAM}"; } 2>&1 >/dev/null
+    && flatpak info "${FLATPAK_STEAM}" >/dev/null 2>&1 \
+    && { flatpak ps | grep "${FLATPAK_STEAM}"; } >/dev/null 2>&1
 }
 
 
@@ -202,7 +202,7 @@ query_server_api() {
   debug "Querying ${query}"
   response="$(curl "${API_PARAMS[@]}" "${query}")"
   debug "Parsing API response"
-  jq -e ".mods[]" 2>&1 >/dev/null <<< "${response}" || err "Missing mods data from API response"
+  jq -e ".mods[]" >/dev/null 2>&1 <<< "${response}" || err "Missing mods data from API response"
 
   INPUT+=( $(jq -r ".mods[] | select(.app_id == ${DAYZ_ID}) | .id" <<< "${response}") )
 }
