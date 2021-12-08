@@ -147,7 +147,9 @@ msg() {
 }
 
 debug() {
-  [[ ${DEBUG} == 1 ]] && echo "[${SELF}][debug] ${@}"
+  if [[ ${DEBUG} == 1 ]]; then
+    echo "[${SELF}][debug] ${@}"
+  fi
 }
 
 check_dir() {
