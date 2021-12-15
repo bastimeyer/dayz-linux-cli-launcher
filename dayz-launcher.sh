@@ -229,14 +229,14 @@ setup_mods() {
     local modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
     [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
     debug "Mod ${modid} found: ${modname}"
-    modname="${modname//\'/}"
+    modlink="@${modid}-$(echo "${modname}" | sed -E 's/[^[:alpha:]0-9]+/_/g; s/^_|_$//g')"
 
-    if ! [[ -L "${dir_dayz}/@${modname}" ]]; then
-      msg "Creating mod symlink for: ${modname}"
-      ln -sr "${modpath}" "${dir_dayz}/@${modname}"
+    if ! [[ -L "${dir_dayz}/@${modlink}" ]]; then
+      msg "Creating mod symlink for: ${modname} (${modlink})"
+      ln -sr "${modpath}" "${dir_dayz}/${modlink}"
     fi
 
-    MODS+=("@${modname}")
+    MODS+=("${modlink}")
   done
 
   return ${missing}
