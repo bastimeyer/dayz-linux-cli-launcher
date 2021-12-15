@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.2.0 - 2021-12-15
+
+- Changed mod symlinks to the `modid-modname` format
+
 ## 0.1.2 - 2021-12-08
 
 - Fixed launcher not working when `--debug` was not set due to incorrect return value of debug log function
