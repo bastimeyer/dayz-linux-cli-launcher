@@ -67,6 +67,11 @@ Environment variables:
 
     If the game is stored in a different Steam library directory, then this
     environment variable needs to be set/changed.
+
+    For example, if the game has been installed in the game library located in
+      /media/games/SteamLibrary/steamapps/common/DayZ
+    then the STEAM_ROOT env var needs to be set like this:
+      STEAM_ROOT=/media/games/SteamLibrary
 ```
 
 ## TODO
