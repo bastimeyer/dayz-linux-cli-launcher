@@ -295,6 +295,10 @@ main() {
   elif [[ -n "${mods}" ]]; then
     msg "Add this to your game's launch options, including the quotes:"
     echo "\"-mod=${mods}\""
+  else
+    msg "Nothing to do..."
+    msg "No mod-ID list, --server address, or --launch parameter set."
+    msg "See --help for all the available options."
   fi
 }
 
