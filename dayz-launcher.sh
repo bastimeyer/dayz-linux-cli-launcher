@@ -236,7 +236,7 @@ setup_mods() {
     debug "Mod ${modid} found: ${modname}"
     modlink="@${modid}-$(echo "${modname}" | sed -E 's/[^[:alpha:]0-9]+/_/g; s/^_|_$//g')"
 
-    if ! [[ -L "${dir_dayz}/@${modlink}" ]]; then
+    if ! [[ -L "${dir_dayz}/${modlink}" ]]; then
       msg "Creating mod symlink for: ${modname} (${modlink})"
       ln -sr "${modpath}" "${dir_dayz}/${modlink}"
     fi
