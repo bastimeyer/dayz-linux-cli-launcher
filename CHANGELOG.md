@@ -1,6 +1,11 @@
 Changelog
 ====
 
+## 0.2.1 - 2021-12-17
+
+- Added `STEAM_ROOT` example to `--help`.
+- Added output messages when not doing anything (missing mod-IDs, server address or launch parameter).
+
 ## 0.2.0 - 2021-12-15
 
 - Changed mod symlinks to the `modid-modname` format
