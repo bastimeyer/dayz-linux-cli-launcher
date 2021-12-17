@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.2.2 - 2021-12-17
+
+- Fixed mod symlink path check
+
 ## 0.2.1 - 2021-12-17
 
 - Added `STEAM_ROOT` example to `--help`.
