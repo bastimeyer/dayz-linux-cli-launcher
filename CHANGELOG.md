@@ -1,6 +1,11 @@
 Changelog
 ====
 
+## 0.3.0 - 2021-12-21
+
+- Added support for optional custom game launch parameters
+- Added examples and known issues to readme
+
 ## 0.2.2 - 2021-12-17
 
 - Fixed mod symlink path check
