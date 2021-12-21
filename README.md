@@ -76,9 +76,30 @@ Environment variables:
       STEAM_ROOT=/media/games/SteamLibrary
 ```
 
-## TODO
+## Examples
 
-- Don't use a custom server query API and query the server directly
+```sh
+# configure mods by ID
+./dayz-launcher.sh -d 123 456 789
+
+# retrieve mods list from server, configure mods and launch the game
+./dayz-launcher.sh -d -l -s address:gameport -p queryport -n nickname
+
+# configure mods by ID and connect
+./dayz-launcher.sh -d 123 456 789 -- -connect=address -name=nickname
+
+# run game from a different Steam games library path
+STEAM_ROOT=/media/games/SteamLibrary ./dayz-launcher.sh -l -s address
+```
+
+## Known issues
+
+- The third party JSON API for querying server data is unfortunately not perfectly reliable. This can't be fixed here, so if there are issues with querying the server data, then please try running the launcher again. Some servers also return invalid data, so manual mods setup via mod IDs is required.
+
+## Future ideas
+
+- Rewrite in Python
+- Don't use a third party server query API and query the server directly
 - Install mods automatically  
   Unfortunately, Steam doesn't support downloading workshop mods via the CLI and only the `steamcmd` CLI utility seems to be able to do this from a command line shell context, but this requires a Steam login via CLI parameters, which is a bit unpractical.
 - If possible, resolve mod dependencies
