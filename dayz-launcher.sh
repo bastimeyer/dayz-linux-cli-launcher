@@ -31,6 +31,7 @@ PORT="27016"
 NAME=""
 INPUT=()
 MODS=()
+PARAMS=()
 
 declare -A DEPS=(
   [gawk]="required for parsing the mod metadata"
@@ -41,7 +42,7 @@ declare -A DEPS=(
 
 print_help() {
   cat <<EOF
-Usage: ${SELF} [OPTION]... [MODID]...
+Usage: ${SELF} [OPTION]... [MODID]... [-- [GAME-PARAM]...]
 
 Automatically set up mods for DayZ, launch the game and connect to a server,
 or print the game's -mod command line argument for custom configuration.
@@ -65,6 +66,8 @@ Command line options:
   --launch
     Launch DayZ after resolving and setting up mods instead of
     printing the game's -mod command line argument.
+    Any custom game parameters that come after the first double-dash (--) will
+    be appended to the overall launch command line. This implies --launch.
 
   -n <name>
   --name <name>
@@ -130,6 +133,12 @@ while (( "$#" )); do
     -n|--name)
       NAME="${2}"
       shift
+      ;;
+    --)
+      shift
+      PARAMS+=("${@}")
+      LAUNCH=1
+      break
       ;;
     *)
       INPUT+=("${1}")
@@ -291,7 +300,7 @@ main() {
     [[ -n "${SERVER}" ]] && cmdline+=("-connect=${SERVER}" -nolauncher -world=empty)
     [[ -n "${NAME}" ]] && cmdline+=("-name=${NAME}")
     msg "Launching DayZ"
-    run_steam -applaunch "${DAYZ_ID}" "${cmdline[@]}"
+    run_steam -applaunch "${DAYZ_ID}" "${cmdline[@]}" "${PARAMS[@]}"
   elif [[ -n "${mods}" ]]; then
     msg "Add this to your game's launch options, including the quotes:"
     echo "\"-mod=${mods}\""

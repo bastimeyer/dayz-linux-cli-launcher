@@ -14,7 +14,7 @@ Please see the "Install DayZ" section down below on how to get the game running 
 ## Usage
 
 ```
-Usage: dayz-launcher.sh [OPTION]... [MODID]...
+Usage: dayz-launcher.sh [OPTION]... [MODID]... [-- [GAME-PARAM]...]
 
 Automatically set up mods for DayZ, launch the game and connect to a server,
 or print the game's -mod command line argument for custom configuration.
@@ -38,6 +38,8 @@ Command line options:
   --launch
     Launch DayZ after resolving and setting up mods instead of
     printing the game's -mod command line argument.
+    Any custom game parameters that come after the first double-dash (--) will
+    be appended to the overall launch command line. This implies --launch.
 
   -n <name>
   --name <name>
