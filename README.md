@@ -94,7 +94,21 @@ STEAM_ROOT=/media/games/SteamLibrary ./dayz-launcher.sh -l -s address
 
 ## Known issues
 
-- The third party JSON API for querying server data is unfortunately not perfectly reliable. This can't be fixed here, so if there are issues with querying the server data, then please try running the launcher again. Some servers also return invalid data, so manual mods setup via mod IDs is required.
+### Third party server query API
+
+The third party JSON API for querying server data is unfortunately not perfectly reliable. This can't be fixed here, so if there are issues with querying the server data, then please try running the launcher again. Some servers also return invalid data, so manual mods setup via mod IDs is required.
+
+### Steam doesn't launch the game
+
+Sometimes the game doesn't launch despite the launcher correctly passing the right parameters to Steam. This is usually caused by a broken singleton process detection of Steam, where it passes the game's launch parameters to the original Steam process and then terminates. Restarting Steam and re-running the launcher fixes the issue.
+
+### Case sensitivity of mod-internal file paths
+
+Due to mods being developed on Windows and Windows not differentiating between file paths with different cases, mod developers sometimes don't care about case sensitivity of file names and directories. This can lead to loading issues on Linux when a file system without case insensitivity support is being used.
+
+In case of ext4, which is the default file system on most distros, case insensitivity has only been implemented in kernel 5.2, which was released in July 2019 (later improved for encrypted file systems in kernel 5.13, released in June 2021). The requirements for enabling case insensitivity are an ext4 filesystem created with at least kernel version 5.2 while the `casefold` option was set, as well as the `+F` flag being set on one of the parent directories.
+
+Please refer to your distro's documentation or search engine of choice for how to properly enable case folding/insensitivity on your file system and whether it's supported.
 
 ## Future ideas
 
