@@ -49,7 +49,7 @@ Command line options:
   -s <address[:port]>
   --server <address[:port]>
     Retrieve a server's mod list and add it to the remaining input.
-    Uses the daemonforge.dev DayZ server JSON API.
+    Uses the dayzsalauncher.com JSON API.
     If --launch is set, it will automatically connect to the server.
 
   -p <port>
@@ -96,7 +96,7 @@ STEAM_ROOT=/media/games/SteamLibrary ./dayz-launcher.sh -l -s address
 
 ### Third party server query API
 
-The third party JSON API for querying server data is unfortunately not perfectly reliable. This can't be fixed here, so if there are issues with querying the server data, then please try running the launcher again. Some servers also return invalid data, so manual mods setup via mod IDs is required.
+Server data is queried via the third-party dayzsalauncher.com JSON API when using the `--server` parameter. Previously, this was done via the daemonforge.dev JSON API, which unfortunately wasn't perfectly reliable. Please try running the launcher again if the query times out, and if the data returned by the server query API doesn't reflect the server's actual mod IDs, then custom mod IDs will need to be set as launch arguments.
 
 ### Steam doesn't launch the game
 
