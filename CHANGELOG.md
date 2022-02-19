@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.4.0 - 2022-02-19
+
+- Switched from daemonforge.dev JSON API to dayzsalauncher.com JSON API
+
 ## 0.3.0 - 2021-12-21
 
 - Added support for optional custom game launch parameters
