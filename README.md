@@ -102,6 +102,8 @@ Server data is queried via the third-party dayzsalauncher.com JSON API when usin
 
 Sometimes the game doesn't launch despite the launcher correctly passing the right parameters to Steam. This is usually caused by a broken singleton process detection of Steam, where it passes the game's launch parameters to the original Steam process and then terminates. Restarting Steam and re-running the launcher fixes the issue.
 
+One of the main reasons why this can happen is an [unresolved bug in the Steam client](https://github.com/ValveSoftware/steam-for-linux/issues/5753) which causes Steam to become unresponsive when launching it via `-applaunch` and passing arguments that reach a certain threshold in length. This problem occurs when trying to join servers which require loading lots of mods and which therefore increase the length of the launch parameters. In order to overcome this limitation, mod directories have been shrinked as much as possible in the `0.5.0` release, so that the launch parameters can be kept as short as possible. This comes at the cost of not being able to tell mod directories apart in the DayZ game directory, at least as a human, but this should solve the issue for the vast majority of servers. Please report any further issues on the issue tracker. Thank you.
+
 ### Case sensitivity of mod-internal file paths
 
 Due to mods being developed on Windows and Windows not differentiating between file paths with different cases, mod developers sometimes don't care about case sensitivity of file names and directories. This can lead to loading issues on Linux when a file system without case insensitivity support is being used.
