@@ -1,6 +1,12 @@
 Changelog
 ====
 
+## 0.5.0 - 2022-04-10
+
+- Shortened the mod directory link names in the DayZ game directory.  
+  This fixes the issue of Steam not launching the game and becoming unresponsive to further launch attempts.  
+  See [#9](https://github.com/bastimeyer/dayz-linux-cli-launcher/issues/9) and [ValveSoftware/steam-for-linux#5753](https://github.com/ValveSoftware/steam-for-linux/issues/5753).
+
 ## 0.4.0 - 2022-02-19
 
 - Switched from daemonforge.dev JSON API to dayzsalauncher.com JSON API
