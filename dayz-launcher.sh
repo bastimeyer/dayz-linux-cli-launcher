@@ -186,6 +186,20 @@ check_flatpak() {
     && { flatpak ps | grep "${FLATPAK_STEAM}"; } >/dev/null 2>&1
 }
 
+dec2base64() {
+  echo "$1" \
+    | LC_ALL=C gawk '
+      {
+        do {
+          printf "%c", and($1, 255)
+          $1 = rshift($1, 8)
+        } while ($1 > 0)
+      }
+    ' \
+    | base64 \
+    | sed 's|/|-|g; s|=||g'
+}
+
 
 # ----
 
@@ -242,7 +256,7 @@ setup_mods() {
     local modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
     [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
     debug "Mod ${modid} found: ${modname}"
-    modlink="@${modid}-$(echo "${modname}" | sed -E 's/[^[:alpha:]0-9]+/_/g; s/^_|_$//g')"
+    local modlink="@$(dec2base64 "${modid}")"
 
     if ! [[ -L "${dir_dayz}/${modlink}" ]]; then
       msg "Creating mod symlink for: ${modname} (${modlink})"
