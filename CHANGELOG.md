@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.5.1 - 2022-05-25
+
+- Fixed error when querying unmodded servers
+
 ## 0.5.0 - 2022-04-10
 
 - Shortened the mod directory link names in the DayZ game directory.  
