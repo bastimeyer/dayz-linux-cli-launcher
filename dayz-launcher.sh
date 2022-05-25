@@ -231,7 +231,8 @@ query_server_api() {
   debug "Querying ${query}"
   response="$(curl "${API_PARAMS[@]}" "${query}")"
   debug "Parsing API response"
-  jq -e ".result.mods[]" >/dev/null 2>&1 <<< "${response}" || err "Missing mods data from API response"
+  jq -e '.result.mods | select(type == "array")' >/dev/null 2>&1 <<< "${response}" || err "Missing mods data from API response"
+  jq -e '.result.mods[]' >/dev/null 2>&1 <<< "${response}" || { msg "This server is unmodded"; return; }
 
   INPUT+=( $(jq -r ".result.mods[] | .steamWorkshopId" <<< "${response}") )
 }
