@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.5.2 - 2022-05-26
+
+- Fixed default game port not being added to the server address if the port is missing
+
 ## 0.5.1 - 2022-05-25
 
 - Fixed error when querying unmodded servers
