@@ -51,6 +51,7 @@ Command line options:
     Retrieve a server's mod list and add it to the remaining input.
     Uses the dayzsalauncher.com JSON API.
     If --launch is set, it will automatically connect to the server.
+    The optional port is the server's game port. Default is: 2302
 
   -p <port>
   --port <port>

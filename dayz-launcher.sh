@@ -5,6 +5,9 @@ SELF=$(basename "$(readlink -f "${0}")")
 
 DAYZ_ID=221100
 
+DEFAULT_GAMEPORT=2302
+DEFAULT_QUERYPORT=27016
+
 FLATPAK_STEAM="com.valvesoftware.Steam"
 FLATPAK_PARAMS=(
   --branch=stable
@@ -26,7 +29,7 @@ DEBUG=0
 LAUNCH=0
 STEAM=""
 SERVER=""
-PORT="27016"
+PORT="${DEFAULT_QUERYPORT}"
 NAME=""
 INPUT=()
 MODS=()
@@ -78,11 +81,12 @@ Command line options:
     Retrieve a server's mod list and add it to the remaining input.
     Uses the dayzsalauncher.com DayZ server JSON API.
     If --launch is set, it will automatically connect to the server.
+    The optional port is the server's game port. Default is: ${DEFAULT_GAMEPORT}
 
   -p <port>
   --port <port>
     The server's query port, not to be confused with the server's game port.
-    Default is: 27016
+    Default is: ${DEFAULT_QUERYPORT}
 
 Environment variables:
 
@@ -123,6 +127,7 @@ while (( "$#" )); do
       ;;
     -s|--server)
       SERVER="${2}"
+      [[ "${SERVER}" = *:* ]] || SERVER="${SERVER}:${DEFAULT_GAMEPORT}"
       shift
       ;;
     -p|--port)
