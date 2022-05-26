@@ -76,7 +76,7 @@ Command line options:
   -s <address[:port]>
   --server <address[:port]>
     Retrieve a server's mod list and add it to the remaining input.
-    Uses the daemonforge.dev DayZ server JSON API.
+    Uses the dayzsalauncher.com DayZ server JSON API.
     If --launch is set, it will automatically connect to the server.
 
   -p <port>
