@@ -259,17 +259,16 @@ setup_mods() {
     local modmeta="${modpath}/meta.cpp"
     [[ -f "${modmeta}" ]] || err "Missing mod metadata for: ${modid}"
 
-    local modname="$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}")"
+    local modname="@$(gawk 'match($0,/name\s*=\s*"(.+)"/,m){print m[1];exit}' "${modmeta}" | sed 's/\ /_/g')"
     [[ -n "${modname}" ]] || err "Missing mod name for: ${modid}"
     debug "Mod ${modid} found: ${modname}"
-    local modlink="@$(dec2base64 "${modid}")"
 
-    if ! [[ -L "${dir_dayz}/${modlink}" ]]; then
-      msg "Creating mod symlink for: ${modname} (${modlink})"
-      ln -sr "${modpath}" "${dir_dayz}/${modlink}"
+    if ! [[ -L "${dir_dayz}/${modname}" ]]; then
+      msg "Creating mod symlink for: ${modname}"
+      ln -sr "${modpath}" "${dir_dayz}/${modname}"
     fi
 
-    MODS+=("${modlink}")
+    MODS+=("${modname}")
   done
 
   return ${missing}
