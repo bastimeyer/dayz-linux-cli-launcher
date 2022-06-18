@@ -1,6 +1,10 @@
 Changelog
 ====
 
+## 0.5.3 - 2022-06-18
+
+- Fixed mods failing to load when the base64 modID string included a `+` character ([#17](https://github.com/bastimeyer/dayz-linux-cli-launcher/pull/17))
+
 ## 0.5.2 - 2022-05-26
 
 - Fixed default game port not being added to the server address if the port is missing
