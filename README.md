@@ -9,7 +9,7 @@ Proton is currently unable to start the game's own regular launcher application 
 
 Automatic Steam workshop mod downloads are currently unsupported due to a limitation of Steam's CLI. Workshop mods will therefore need to be subscribed manually via the web browser. A URL for each missing mod will be printed to the output.
 
-Please see the "Install DayZ" section down below on how to get the game running on Linux.
+Please see the "[Install DayZ](https://github.com/bastimeyer/dayz-linux-cli-launcher#install-dayz)" section down below on how to get the game running on Linux.
 
 ## Usage
 
